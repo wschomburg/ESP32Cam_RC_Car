@@ -46,61 +46,67 @@
     }
     
     cam_center {
+        display: grid;
         grid-column: 2 / span 1;
         grid-row: 1 / span 1;
-        //border-radius: 0.5em 0.5em 0.5em;
-        //padding: .5em;
-        // margin: 0em;
+        border-radius: 0.5em 0.5em 0.5em;
+        padding: .5em;
+        //margin: 0em;
     }
     
     cam_up {
+        display: grid;
         grid-column: 3 / span 1;
         grid-row: 1 / span 1;
-        //border-radius: 0.5em 0.5em 0.5em;
-        //padding: .5em;
-        // margin: 0em;
+        border-radius: 0.5em 0.5em 0.5em;
+        padding: .5em;
+        //margin: 0em;
     }
     
     cam_light {
+        display: grid;
         grid-column: 4 / span 1;
         grid-row: 1 / span 1;
-        //border-radius: 0.5em 0.5em 0.5em;
-        //padding: .5em;
-        // margin: 0em;
+        border-radius: 0.5em 0.5em 0.5em;
+        padding: .5em;
+        //margin: 0em;
     }
     
     cam_left {
+        display: grid;
         grid-column: 2 / span 1;
         grid-row: 2 / span 1;
-        //border-radius: 0.5em 0.5em 0.5em;
-        //padding: .5em;
-        // margin: 0em;
+        border-radius: 0.5em 0.5em 0.5em;
+        padding: .5em;
+        //margin: 0em;
     }
     
     cam_down {
+        display: grid;
         grid-column: 3 / span 1;
         grid-row: 2 / span 1;
-        //border-radius: 0.5em 0.5em 0.5em;
-        //padding: .5em;
-        // margin: 0em;
+        border-radius: 0.5em 0.5em 0.5em;
+        padding: .5em;
+        //margin: 0em;
     }
     
     cam_right {
+        display: grid;
         grid-column: 4 / span 1;
         grid-row: 2 / span 1;
-        //border-radius: 0.5em 0.5em 0.5em;
-        //padding: .5em;
-        // margin: 0em;
+        border-radius: 0.5em 0.5em 0.5em;
+        padding: .5em;
+        //margin: 0em;
     }
     
     joystick {
+        display: grid;
         // background: #ebf5d7;
         // border-color: #8db243;
         grid-column: 2 / span 3;
         grid-row: 3 / span 3;
-        // border-radius: 0.5em 0.5em 0.5em;
-        // border: 1px solid;
-        // padding: .5em;
+        border-radius: 0.5em 0.5em 0.5em;
+        padding: .5em;
         // margin: 0em;
     }
     
@@ -267,11 +273,11 @@
     </cam_right>
 
     <joystick>
-        <button id="joydata1">
-            X : <input id="joyX" type="text" /><br> 
-            Y : <input id="joyY" type="text" />
-        </button>
-        <div id="joyDiv" class="joystick" ontouchmove="onWheelMove(this.id, event)" ontouchstart="mouseDown(this.id, event)" ontouchend="mouseUp(this.id)"></div>
+        <div id="joydata1">
+            X : <input id="joyX" type="button" />
+            Y : <input id="joyY" type="button" />
+        </div>      
+        <div id="joyDiv" class="joystick" ontouchmove="onWheelMove(this.id, event)" ontouchstart="mouseDown(this.id, event)" ontouchend="mouseUp(this.id)"></div>  
     </joystick>
     <script>
         var init = false;
@@ -296,7 +302,7 @@
 
         function configWebSocket() {
             var server = 'ws://' + document.location.href + ':86';
-            var server = 'ws://' + '192.168.10.112:86';
+            //var server = 'ws://' + '192.168.10.112:86';
             server = server.replace('http://', '').replace('/:', ':')
             var socket = new WebSocket(server);
             socket.binaryType = 'arraybuffer';
