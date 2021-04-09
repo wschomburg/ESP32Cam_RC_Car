@@ -1,0 +1,392 @@
+<html>
+
+<head>
+    <title>ESP32-CAM Robot Car</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        // height: 100%
+    }
+    
+    body {
+        //margin: 1em;
+        margin: auto;
+        padding: 0;
+        padding: .5em;
+        max-width: 60em;
+        font-family: sans-serif;
+        color: #333333;
+        display: grid;
+        text-align: center;
+        grid-template-columns: 4fr 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 3fr;
+        overscroll-behavior: contain;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+    }
+    
+    stream {
+        // background: #ffede0;
+        // border-color: #8db243;
+        // border-radius: 0.5em 0.5em 0.5em;
+        border: 1px solid;
+        padding: .5em;
+        margin: auto;
+        grid-column: 1 / span 1;
+        grid-row: 1 / span 5;
+    }
+    
+    cam_center {
+        grid-column: 2 / span 1;
+        grid-row: 1 / span 1;
+        //border-radius: 0.5em 0.5em 0.5em;
+        //padding: .5em;
+        // margin: 0em;
+    }
+    
+    cam_up {
+        grid-column: 3 / span 1;
+        grid-row: 1 / span 1;
+        //border-radius: 0.5em 0.5em 0.5em;
+        //padding: .5em;
+        // margin: 0em;
+    }
+    
+    cam_light {
+        grid-column: 4 / span 1;
+        grid-row: 1 / span 1;
+        //border-radius: 0.5em 0.5em 0.5em;
+        //padding: .5em;
+        // margin: 0em;
+    }
+    
+    cam_left {
+        grid-column: 2 / span 1;
+        grid-row: 2 / span 1;
+        //border-radius: 0.5em 0.5em 0.5em;
+        //padding: .5em;
+        // margin: 0em;
+    }
+    
+    cam_down {
+        grid-column: 3 / span 1;
+        grid-row: 2 / span 1;
+        //border-radius: 0.5em 0.5em 0.5em;
+        //padding: .5em;
+        // margin: 0em;
+    }
+    
+    cam_right {
+        grid-column: 4 / span 1;
+        grid-row: 2 / span 1;
+        //border-radius: 0.5em 0.5em 0.5em;
+        //padding: .5em;
+        // margin: 0em;
+    }
+    
+    joystick {
+        // background: #ebf5d7;
+        // border-color: #8db243;
+        grid-column: 2 / span 3;
+        grid-row: 3 / span 3;
+        // border-radius: 0.5em 0.5em 0.5em;
+        // border: 1px solid;
+        // padding: .5em;
+        // margin: 0em;
+    }
+    
+    .button {
+        height: 100%;
+        width: 100%;
+        //height: 2fr;
+        //width: 2fr;
+    }
+    
+    .arrow {
+        border: solid black;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 6px;
+    }
+    
+    .right {
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+    }
+    
+    .left {
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+    }
+    
+    .up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+    }
+    
+    .down {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+    }
+    
+    .led {
+        display: inline-block;
+        //margin-top: 20px;
+        //width: 30%;
+    }
+    
+    .arrows {
+        margin-top: 17%;
+    }
+    
+    .center {
+        display: inline-block;
+    }
+    
+    .joystick {
+        width: 200px;
+        height: 200px;
+        margin: auto;
+    }
+</style>
+<script type="text/javascript">
+    var JoyStick = function(t, e) {
+        var i = void 0 === (e = e || {}).title ? "joystick" : e.title,
+            n = void 0 === e.width ? 0 : e.width,
+            o = void 0 === e.height ? 0 : e.height,
+            h = void 0 === e.internalFillColor ? "#00AA00" : e.internalFillColor,
+            r = void 0 === e.internalLineWidth ? 2 : e.internalLineWidth,
+            d = void 0 === e.internalStrokeColor ? "#003300" : e.internalStrokeColor,
+            a = void 0 === e.externalLineWidth ? 2 : e.externalLineWidth,
+            l = void 0 === e.externalStrokeColor ? "#008000" : e.externalStrokeColor,
+            c = document.getElementById(t),
+            u = document.createElement("canvas");
+        u.id = i, 0 == n && (n = c.clientWidth), 0 == o && (o = c.clientHeight), u.width = n, u.height = o, c.appendChild(u);
+        var s = u.getContext("2d"),
+            f = 0,
+            v = 2 * Math.PI,
+            g = (u.width - 110) / 2,
+            w = g + 5,
+            C = g + 30,
+            m = u.width / 2,
+            p = u.height / 2,
+            L = u.width / 10,
+            E = -1 * L,
+            S = u.height / 10,
+            k = -1 * S,
+            W = m,
+            G = p;
+
+        function x() {
+            s.beginPath(), s.arc(m, p, C, 0, v, !1), s.lineWidth = a, s.strokeStyle = l, s.stroke()
+        }
+
+        function y() {
+            s.beginPath(), W < g && (W = w), W + g > u.width && (W = u.width - w), G < g && (G = w), G + g > u.height && (G = u.height - w), s.arc(W, G, g, 0, v, !1);
+            var t = s.createRadialGradient(m, p, 5, m, p, 200);
+            t.addColorStop(0, h), t.addColorStop(1, d), s.fillStyle = t, s.fill(), s.lineWidth = r, s.strokeStyle = d, s.stroke()
+        }
+        "ontouchstart" in document.documentElement ? (u.addEventListener("touchstart", function(t) {
+            f = 1
+        }, !1), u.addEventListener("touchmove", function(t) {
+            t.preventDefault(), 1 == f && (W = t.touches[0].pageX, G = t.touches[0].pageY, W -= u.offsetLeft, G -= u.offsetTop, s.clearRect(0, 0, u.width, u.height), x(), y())
+        }, !1), u.addEventListener("touchend", function(t) {
+            f = 0, W = m, G = p, s.clearRect(0, 0, u.width, u.height), x(), y()
+        }, !1)) : (u.addEventListener("mousedown", function(t) {
+            f = 1
+        }, !1), u.addEventListener("mousemove", function(t) {
+            1 == f && (W = t.pageX, G = t.pageY, W -= u.offsetLeft, G -= u.offsetTop, s.clearRect(0, 0, u.width, u.height), x(), y())
+        }, !1), u.addEventListener("mouseup", function(t) {
+            f = 0, W = m, G = p, s.clearRect(0, 0, u.width, u.height), x(), y()
+        }, !1)), x(), y(), this.GetWidth = function() {
+            return u.width
+        }, this.GetHeight = function() {
+            return u.height
+        }, this.GetPosX = function() {
+            return W
+        }, this.GetPosY = function() {
+            return G
+        }, this.GetX = function() {
+            return ((W - m) / w * 100).toFixed()
+        }, this.GetY = function() {
+            return ((G - p) / w * 100 * -1).toFixed()
+        }, this.GetDir = function() {
+            var t = "",
+                e = W - m,
+                i = G - p;
+            return i >= k && i <= S && (t = "C"), i < k && (t = "N"), i > S && (t = "S"), e < E && ("C" == t ? t = "W" : t += "W"), e > L && ("C" == t ? t = "E" : t += "E"), t
+        }
+    };
+</script>
+
+<body>
+
+    <stream>
+        <img src="" class="img" id="STREAM">
+    </stream>
+
+
+    <cam_center>
+        <button class="button" type="button" id="CENTER" onclick="mouseClick(this.id)">
+        <i class="center">Center</i></button>
+    </cam_center>
+
+    <cam_up>
+        <button class="button" type="button" id="UP" ontouchstart="mouseDownHead(this.id)" ontouchend="mouseUpHead(this.id)">
+          <i class="arrow up"></i></button>
+    </cam_up>
+
+    <cam_light>
+        <button class="button" type="button" id="LED" onclick="mouseClick(this.id)">
+          LED</button>
+    </cam_light>
+
+    <cam_left>
+        <button class="button" type="button" id="LEFT" ontouchstart="mouseDownHead(this.id)" ontouchend="mouseUpHead(this.id)">
+          <i class="arrow left"></i></button>
+        </div>
+    </cam_left>
+
+    <cam_down>
+        <button class="button" type="button" id="DOWN" ontouchstart="mouseDownHead(this.id)" ontouchend="mouseUpHead(this.id)">
+          <i class="arrow down"></i></button>
+    </cam_down>
+
+    <cam_right>
+        <button class="button" type="button" id="RIGHT" ontouchstart="mouseDownHead(this.id)" ontouchend="mouseUpHead(this.id)">
+          <i class="arrow right"></i></button>
+    </cam_right>
+
+    <joystick>
+        <button id="joydata1">
+            X : <input id="joyX" type="text" /><br> 
+            Y : <input id="joyY" type="text" />
+        </button>
+        <div id="joyDiv" class="joystick" ontouchmove="onWheelMove(this.id, event)" ontouchstart="mouseDown(this.id, event)" ontouchend="mouseUp(this.id)"></div>
+    </joystick>
+    <script>
+        var init = false;
+
+        // Create JoyStick object into the DIV 'joyDiv'
+        var joy = new JoyStick('joyDiv');
+
+        setInterval(function() {
+            joyX.value = joy.GetX();
+        }, 50);
+        setInterval(function() {
+            joyY.value = joy.GetY();
+        }, 50);
+
+        $(document).ready(function() {
+            if (!('WebSocket' in window)) {
+                alert('Your browser does not support websockets');
+            } else {
+                configWebSocket();
+            }
+        });
+
+        function configWebSocket() {
+            var server = 'ws://' + document.location.href + ':86';
+            var server = 'ws://' + '192.168.10.112:86';
+            server = server.replace('http://', '').replace('/:', ':')
+            var socket = new WebSocket(server);
+            socket.binaryType = 'arraybuffer';
+            if (socket) {
+                socket.onopen = function() {}
+                socket.onmessage = async function(msg) {
+                    var bytes = new Uint8Array(msg.data);
+                    var binary = '';
+                    var len = bytes.byteLength;
+                    for (var i = 0; i < len; i++) {
+                        binary += String.fromCharCode(bytes[i])
+                    }
+                    var img = document.getElementById('STREAM');
+                    img.src = 'data:image/jpg;base64,' + window.btoa(binary);
+
+                }
+                socket.onclose = function() {
+                    showServerResponse('The connection has been closed.');
+                }
+            }
+        }
+
+        function onWheelMove(id, event) {
+            var x = document.getElementById("X");
+            var y = document.getElementById("Y");
+            var url = "/MOVE" + "?val=" + joyX.value + "," + joyY.value;
+            sendCommand(url);
+        }
+
+        function mouseDown(id, event) {
+            var x = document.getElementById("X");
+            var y = document.getElementById("Y");
+            var url = "/MOVE" + "?val=" + joyX.value + "," + joyY.value;
+            sendCommand(url);
+        }
+
+        function mouseUp(id) {
+            var url = "/MOVE" + "?val=0,0"
+            sendCommand(url);
+            sendCommand(url);
+            sendCommand(url);
+            sendCommand(url);
+        }
+
+        function mouseDownHead(id) {
+            var url = "/" + id + "?val=ON";
+            sendCommand(url);
+        }
+
+        function mouseUpHead(id) {
+            var url = "/" + id + "?val=OFF";
+            sendCommand(url);
+        }
+
+        var ledState = false;
+
+        function mouseClick(id) {
+            if (id == "LED") {
+                ledState = !ledState;
+                var ledStateStr = ledState ? "ON" : "OFF"
+                var url = "/" + id + "?val=" + ledStateStr;
+                sendCommand(url);
+            } else {
+                if (id == "CENTER") {
+                    var url = "/" + id + "?val=ON";
+                    sendCommand(url);
+
+                }
+            }
+        }
+
+        function sendCommand(url) {
+            var xhr = new XMLHttpRequest();
+            //xhr.onreadystatechange=ProcessResponse;
+            xhr.open("GET", url, true);
+            xhr.overrideMimeType('text/plain; charset=x-user-defined');
+            xhr.send(null);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+
+                }
+            }
+        }
+
+        window.oncontextmenu = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        };
+    </script>
+</body>
+
+</html>
